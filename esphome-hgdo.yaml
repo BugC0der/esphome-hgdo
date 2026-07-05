@@ -1,0 +1,141 @@
+# Board: Espressif ESP8266 ESP-12E
+# Definition: definitions/boards/esp12e/manifest.yaml
+
+substitutions:
+  devicename: hoermann
+  friendly_name: "Hoermann Door"
+  device_description: "Hoermann Door Control"
+  recovery_pin: 5
+esp8266:
+  board: esp12e
+esphome:
+  name: ${devicename}
+  name_add_mac_suffix: true
+  comment: ${device_description}
+  friendly_name: ${friendly_name}
+  on_boot:
+    priority: 600.0
+    then:
+      - lambda: |-
+          pinMode(${recovery_pin}, INPUT_PULLUP);
+          delay(100);
+          if (digitalRead(${recovery_pin}) == LOW) 
+          {
+            WiFi.persistent(false); // Don't save changes to flash
+            WiFi.disconnect(true);  // Disconnect and erase AP info
+            WiFi.mode(WIFI_OFF);    // Turn off Wi-Fi entirely
+            ESP.restart();
+          }
+logger:
+  level: INFO 
+  logs: 
+    hoermann: INFO 
+
+api:
+  encryption:
+    key: "/W8NvNK0tj3lsD5fz8eK1cWUAP7/sVTvvzwZFIbngcs="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: "INVALID_SSID"
+  password: "INVALID_PASSWORD"
+  fast_connect: true
+  ap:
+    ssid: "Hoermann-Setup"
+    password: "hoermann"
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    
+# Text sensors with general information
+text_sensor:
+  - platform: version
+    name: ${friendly_name} Version
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+      icon: mdi:ip-network
+      entity_category: diagnostic
+    ssid:
+      name: WiFi SSID
+      icon: mdi:wifi-settings
+      entity_category: diagnostic
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  scan: true
+  
+sensor:
+  # Uptime sensor
+  - platform: uptime
+    name: Uptime
+    icon: mdi:timer-outline
+    unit_of_measurement: h
+    update_interval: 30s
+    entity_category: diagnostic
+  # WiFi Signal sensor
+  - platform: wifi_signal
+    name: Wifi Signal
+    update_interval: 30s
+    icon: mdi:wifi
+    entity_category: diagnostic
+  - platform: bme280_i2c
+    address: 0x76
+    temperature:
+      name: BME280 Temperature
+      id: bme_temp
+      filters:
+        - offset: -7 # -7 is a good value when used in an enclosure
+    pressure:
+      name: BME280 Pressure
+      id: bme_pressure
+    humidity:
+      name: BME280 Humidity
+      id: bme_hum
+
+uart:
+  id: pic_uart
+  tx_pin: GPIO15
+  rx_pin: GPIO13
+  baud_rate: 19200  # Must match your PIC's baud rate
+  # parity: NONE   # Default is 8N1. Change if your PIC requires EVEN/ODD
+
+external_components:
+#  - source:
+#      type: local
+#      path: ./esphome-yaml/components
+    - source: github://BugC0der/esphome-yaml/components
+      components: [hoermann]
+    
+hoermann:
+  uart_id: pic_uart
+
+cover:
+  - platform: hoermann
+    id: hoermann_cover
+    name: "Garage Door"
+    device_class: garage
+
+switch:
+  - platform: hoermann
+    type: light
+    name: "Garage Light"
+  - platform: hoermann
+    type: venting
+    name: "Garage Venting"
+
+binary_sensor:
+  - platform: hoermann
+    type: error
+    name: "Garage Error"
+  - platform: hoermann
+    type: prewarn
+    name: "Garage Prewarn"
+  - platform: hoermann
+    type: option_relay
+    name: "Garage Option Relay"
