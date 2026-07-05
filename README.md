@@ -17,6 +17,11 @@ Connect via USB. Use `--device` to specify your serial port:
 ```bash
 esphome run esphome-hgdo.yaml --device 192.168.1.50
 ```
+## Flash Pre-compiled Binary (USB)
+Use `esptool` to flash `firmware/firmware.bin` directly:
+
+* **Windows:** `esptool.py --port COM3 write_flash 0x0 firmware/firmware.bin`
+* **Linux/macOS:** `esptool.py --port /dev/ttyUSB0 write_flash 0x0 firmware/firmware.bin`
 
 ## Separate Commands
 * **Compile only:** `esphome compile esphome-hgdo.yaml`
