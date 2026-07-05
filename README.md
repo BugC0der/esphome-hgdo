@@ -6,18 +6,19 @@ pip install esphome
 ```
 
 ## Compile & Upload (USB)
-Connect your device via USB, then run:
-```bash
-esphome run esphome-hgdo.yaml
-```
+Connect via USB. Use `--device` to specify your serial port:
+
+* **Windows:** `esphome run esphome-hgdo.yaml --device COM3`
+* **Linux/macOS:** `esphome run esphome-hgdo.yaml --device /dev/ttyUSB0`
+
+*(Tip: Find your exact port in Device Manager or via `ls /dev/tty*`)*
 
 ## Compile & Upload (OTA)
-If the device is already connected to your network:
 ```bash
-esphome run esphome-hgdo.yaml --device <IP_ADDRESS>
+esphome run esphome-hgdo.yaml --device 192.168.1.50
 ```
 
 ## Separate Commands
-If you need to split the process:
 * **Compile only:** `esphome compile esphome-hgdo.yaml`
-* **Upload only:** `esphome upload esphome-hgdo.yaml`
+* **Upload only (USB):** `esphome upload esphome-hgdo.yaml --device COM3`
+* **Upload only (OTA):** `esphome upload esphome-hgdo.yaml --device 192.168.1.50`
