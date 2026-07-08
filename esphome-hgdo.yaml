@@ -13,27 +13,16 @@ esphome:
   name_add_mac_suffix: true
   comment: ${device_description}
   friendly_name: ${friendly_name}
-  on_boot:
-    priority: 600.0
-    then:
-      - lambda: |-
-          pinMode(${recovery_pin}, INPUT_PULLUP);
-          delay(100);
-          if (digitalRead(${recovery_pin}) == LOW) 
-          {
-            WiFi.persistent(false); // Don't save changes to flash
-            WiFi.disconnect(true);  // Disconnect and erase AP info
-            WiFi.mode(WIFI_OFF);    // Turn off Wi-Fi entirely
-            ESP.restart();
-          }
 logger:
   level: INFO 
   logs: 
-    hoermann: INFO 
+    hoermann: WARN
+
+web_server:
+  version: 3
+  port: 80
 
 api:
-  encryption:
-    key: "/W8NvNK0tj3lsD5fz8eK1cWUAP7/sVTvvzwZFIbngcs="
 
 ota:
   - platform: esphome
@@ -75,7 +64,7 @@ sensor:
   - platform: uptime
     name: Uptime
     icon: mdi:timer-outline
-    unit_of_measurement: h
+    unit_of_measurement: s
     update_interval: 30s
     entity_category: diagnostic
   # WiFi Signal sensor
@@ -139,3 +128,7 @@ binary_sensor:
   - platform: hoermann
     type: option_relay
     name: "Garage Option Relay"
+
+button:
+  - platform: restart
+    name: "Restart ${friendly_name}"
