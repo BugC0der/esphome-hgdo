@@ -59,14 +59,12 @@ i2c:
   scan: true
   
 sensor:
-  # Uptime sensor
   - platform: uptime
     name: Uptime
     icon: mdi:timer-outline
     unit_of_measurement: s
     update_interval: 30s
     entity_category: diagnostic
-  # WiFi Signal sensor
   - platform: wifi_signal
     name: Wifi Signal
     update_interval: 30s
@@ -90,8 +88,7 @@ uart:
   id: pic_uart
   tx_pin: GPIO15
   rx_pin: GPIO13
-  baud_rate: 19200  # Must match your PIC's baud rate
-  # parity: NONE   # Default is 8N1. Change if your PIC requires EVEN/ODD
+  baud_rate: 19200
 
 external_components:
 #  - source:
@@ -131,3 +128,9 @@ binary_sensor:
 button:
   - platform: restart
     name: "Restart ${friendly_name}"
+# - platform: hoermann
+#   type: impulse
+#   name: "Garage Impulse"
+# - platform: hoermann
+#   type: emergency_stop 
+#   name: "Garage Emergency Stop"
